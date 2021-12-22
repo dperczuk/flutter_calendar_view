@@ -4,6 +4,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../calendar_constants.dart';
 import '../calendar_controller_provider.dart';
@@ -87,6 +88,9 @@ class WeekView<T> extends StatefulWidget {
   /// Called when user taps on event tile.
   final CellTapCallback<T>? onEventTap;
 
+  /// Total planned hours for the current month
+  final double? plannedHoursForMonth;
+
   /// Main widget for week view.
   const WeekView({
     Key? key,
@@ -108,10 +112,11 @@ class WeekView<T> extends StatefulWidget {
     this.onPageChange,
     this.weekPageHeaderBuilder,
     this.eventArranger,
-    this.weekTitleHeight = 50,
+    this.weekTitleHeight = 85,
     this.weekDayBuilder,
     this.backgroundColor = Colors.white,
     this.onEventTap,
+    this.plannedHoursForMonth = 0,
   }) : super(key: key);
 
   @override
@@ -124,6 +129,7 @@ class WeekViewState<T> extends State<WeekView<T>> {
   late double _timeLineWidth;
   late double _hourHeight;
   late double _timeLineOffset;
+  late double _plannedHoursForMonth;
   late DateTime _currentStartDate;
   late DateTime _currentEndDate;
   late DateTime _maxDate;
@@ -186,6 +192,7 @@ class WeekViewState<T> extends State<WeekView<T>> {
     _weekHeaderBuilder =
         widget.weekPageHeaderBuilder ?? _defaultWeekPageHeaderBuilder;
     _weekDayBuilder = widget.weekDayBuilder ?? _defaultWeekDayBuilder;
+    _plannedHoursForMonth = widget.plannedHoursForMonth ?? _plannedHoursForMonth;
   }
 
   @override
@@ -253,7 +260,6 @@ class WeekViewState<T> extends State<WeekView<T>> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _weekHeaderBuilder(_currentStartDate, _currentEndDate),
               Expanded(
                 child: SizedBox(
                   height: _height,
@@ -291,6 +297,7 @@ class WeekViewState<T> extends State<WeekView<T>> {
                         controller: _controller,
                         hourHeight: _hourHeight,
                         eventArranger: _eventArranger,
+                        plannedHoursForMonth: _plannedHoursForMonth,
                       );
                     },
                   ),
@@ -316,16 +323,43 @@ class WeekViewState<T> extends State<WeekView<T>> {
     }
   }
 
+  String _formatToDate(DateTime dateTimeValue) {
+    return DateFormat('yyyy-MM-dd').format(dateTimeValue);
+  }
+
+  TextStyle _getWeekDayTextStyle(date) {
+    return TextStyle(
+      fontWeight: (_formatToDate(date) == _formatToDate(DateTime.now())) ? FontWeight.bold : FontWeight.normal,
+      color: (_formatToDate(date) == _formatToDate(DateTime.now())) ? Colors.black : Colors.black87,
+    );
+  }
+
   /// Default builder for week line.
   Widget _defaultWeekDayBuilder(DateTime date) {
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(Constants.weekTitles[date.weekday - 1]),
-          Text(date.day.toString()),
-        ],
+      child: GestureDetector(
+        onTap: () async {
+          final selectedDate = await showDatePicker(
+            context: context,
+            initialDate: date,
+            firstDate: CalendarConstants.minDate,
+            lastDate: CalendarConstants.maxDate,
+          );
+
+          if (selectedDate == null) return;
+          jumpToWeek(selectedDate);
+        },
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              Constants.weekTitles[date.weekday - 1],
+              style: _getWeekDayTextStyle(date),
+            ),
+            Text(date.day.toString(), style: _getWeekDayTextStyle(date)),
+          ],
+        ),
       ),
     );
   }
@@ -339,7 +373,7 @@ class WeekViewState<T> extends State<WeekView<T>> {
       child: Padding(
         padding: const EdgeInsets.only(right: 7.0),
         child: Text(
-          "${((date.hour - 1) % 12) + 1} ${date.hour ~/ 12 == 0 ? "am" : "pm"}",
+          "${_addLeadingZeroIfNeeded(((date.hour - 1) % 24) + 1)}:00",
           textAlign: TextAlign.right,
           style: TextStyle(
             fontSize: 15.0,
@@ -488,4 +522,12 @@ class WeekViewState<T> extends State<WeekView<T>> {
   /// Returns true if it does else false.
   bool _showLiveTimeIndicator(List<DateTime> dates) =>
       dates.any((date) => date.compareWithoutTime(DateTime.now()));
+
+  String _addLeadingZeroIfNeeded(int value) {
+    if (value < 10) {
+      return '0$value';
+    }
+
+    return value.toString();
+  }
 }

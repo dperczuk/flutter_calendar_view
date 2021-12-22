@@ -3,6 +3,7 @@
 // that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../components/_internal_components.dart';
 import '../event_arrangers/event_arrangers.dart';
@@ -74,6 +75,9 @@ class InternalWeekViewPage<T> extends StatelessWidget {
   /// Called when user taps on event tile.
   final CellTapCallback<T>? onTileTap;
 
+  /// Total planned hours for the current month
+  final double plannedHoursForMonth;
+
   /// A single page for week view.
   const InternalWeekViewPage({
     Key? key,
@@ -97,6 +101,7 @@ class InternalWeekViewPage<T> extends StatelessWidget {
     required this.verticalLineOffset,
     required this.weekTitleWidth,
     required this.onTileTap,
+    required this.plannedHoursForMonth,
   }) : super(key: key);
 
   @override
@@ -115,6 +120,29 @@ class InternalWeekViewPage<T> extends StatelessWidget {
                 SizedBox(
                   height: weekTitleHeight,
                   width: timeLineWidth,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${DateFormat.MMMM().format(dates.first).substring(0, 3)}.',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                      Text(
+                        DateFormat.y().format(dates.first),
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        '$plannedHoursForMonth h',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
                 ),
                 ...List.generate(
                   dates.length,
@@ -125,7 +153,7 @@ class InternalWeekViewPage<T> extends StatelessWidget {
                       dates[index],
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
