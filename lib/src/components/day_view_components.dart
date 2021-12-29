@@ -69,15 +69,17 @@ class RoundedEventTile extends StatelessWidget {
         children: [
           if (title.isNotEmpty)
             Expanded(
-              child: Text(
-                title,
-                style: titleStyle ??
-                    TextStyle(
-                      fontSize: 20,
-                      color: backgroundColor.accent,
-                    ),
-                softWrap: true,
-                overflow: TextOverflow.fade,
+              child: Center(
+                child: Text(
+                  title,
+                  style: titleStyle ??
+                      TextStyle(
+                        fontSize: 20,
+                        color: backgroundColor.accent,
+                      ),
+                  softWrap: true,
+                  overflow: TextOverflow.fade,
+                ),
               ),
             ),
           if (description.isNotEmpty)
