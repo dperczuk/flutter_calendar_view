@@ -89,7 +89,7 @@ class WeekView<T> extends StatefulWidget {
   final CellTapCallback<T>? onEventTap;
 
   /// Total planned hours for the current month
-  final double? plannedHoursForMonth;
+  final String? plannedHoursForMonth;
 
   /// Main widget for week view.
   const WeekView({
@@ -116,7 +116,7 @@ class WeekView<T> extends StatefulWidget {
     this.weekDayBuilder,
     this.backgroundColor = Colors.white,
     this.onEventTap,
-    this.plannedHoursForMonth = 0,
+    this.plannedHoursForMonth = '0h 0m',
   }) : super(key: key);
 
   @override
@@ -129,7 +129,7 @@ class WeekViewState<T> extends State<WeekView<T>> {
   late double _timeLineWidth;
   late double _hourHeight;
   late double _timeLineOffset;
-  late double _plannedHoursForMonth;
+  late String _plannedHoursForMonth;
   late DateTime _currentStartDate;
   late DateTime _currentEndDate;
   late DateTime _maxDate;
@@ -369,14 +369,14 @@ class WeekViewState<T> extends State<WeekView<T>> {
   ///
   Widget _defaultTimeLineBuilder(DateTime date) {
     return Transform.translate(
-      offset: Offset(0, -7.5),
+      offset: Offset(2, -7.5),
       child: Padding(
         padding: const EdgeInsets.only(right: 7.0),
         child: Text(
           "${_addLeadingZeroIfNeeded(((date.hour - 1) % 24) + 1)}:00",
           textAlign: TextAlign.right,
           style: TextStyle(
-            fontSize: 15.0,
+            fontSize: 14.0,
           ),
         ),
       ),
