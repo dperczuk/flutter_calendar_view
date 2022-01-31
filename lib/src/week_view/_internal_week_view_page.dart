@@ -76,7 +76,7 @@ class InternalWeekViewPage<T> extends StatelessWidget {
   final CellTapCallback<T>? onTileTap;
 
   /// Total planned hours for the current month
-  final double plannedHoursForMonth;
+  final String plannedHoursForMonth;
 
   /// A single page for week view.
   const InternalWeekViewPage({
@@ -138,7 +138,7 @@ class InternalWeekViewPage<T> extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '$plannedHoursForMonth h',
+                        plannedHoursForMonth,
                         style: TextStyle(color: Colors.grey),
                       ),
                     ],
